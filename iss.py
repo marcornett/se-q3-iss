@@ -15,8 +15,8 @@ def get_astronauts():
     in_space = len(data['people'])
     for person in data['people']:
         info.append(f"{person['name']} is currently onboard {person['craft']}")
-    print(info)
-    print(in_space)
+    print(f'Total astronauts in space: {in_space}')
+    print('\n'.join(info))
 
 
 def get_coordinates():
@@ -24,17 +24,15 @@ def get_coordinates():
     data = response.json()
     iss_position = data['iss_position']
     coordinates = dict(
-        latitude=iss_position['latitude'], longitude=iss_position['longitude'], timestamp=data['timestamp'])
-    print(
-        f"latitude: {iss_position['latitude']}, longitude: {iss_position['longitude']}")
-    print(data['timestamp'])
+        latitude=iss_position['latitude'],
+        longitude=iss_position['longitude'],
+        timestamp=data['timestamp']
+    )
     return coordinates
 
 
 def create_graphic():
-    # print(coordinates['latitude'])
-    # print(coordinates['longitude'])
-    # print(coordinates['timestamp'])
+    # Turn on for auto refresh
     # while True:
     coordinates = get_coordinates()
 
@@ -43,34 +41,41 @@ def create_graphic():
     screen.setup(720, 360)
     screen.bgpic('map.gif')
     screen.setworldcoordinates(-180, -90, 180, 90)
+    screen.register_shape('iss.gif')
 
     iss = turtle.Turtle()
-    iss.color('pink')
-    iss.shape('circle')
-    iss.speed(10)
+    iss.color('blue')
+    iss.hideturtle()
+    iss.shape('iss.gif')
     iss.setheading(45)
     iss.penup()
     iss.goto(float(coordinates['longitude']),
              float(coordinates['latitude']))
-
+    iss.showturtle()
     response = requests.get(
-        f'http://api.open-notify.org/iss-pass.json?lat={39.76838}&lon={-86.15804}')
+        f'http://api.open-notify.org/iss-pass.json?'
+        f'lat={39.76838}&lon={-86.15804}')
     data = response.json()
 
-    print()
-    # todo: risetime
     passover_time = time.ctime(data['response'][0]['risetime'])
 
     indianapolis = turtle.Turtle()
+    indianapolis.hideturtle()
     indianapolis.shape('circle')
-    indianapolis.shapesize(.5)
+    indianapolis.shapesize(.3)
     indianapolis.color('yellow')
     indianapolis.penup()
     indianapolis.goto(-86.1580556, 39.7683333)
+    indianapolis.showturtle()
     indianapolis.write(passover_time)
     indianapolis.speed(10)
     indianapolis.setheading(45)
+
+    # Turn on for auto refresh
+    # time.sleep(10)
+
     turtle.done()
+    # screen.ontimer(create_graphic, 250)
     # screen.mainloop()
 
 
